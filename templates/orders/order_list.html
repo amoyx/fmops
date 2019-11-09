@@ -1,0 +1,278 @@
+{% extends 'index.html' %}
+{% block page-content %}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>任务列表</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/index">Home</a>
+            </li>
+            <li>
+                <a href="/koderover/list/">KodeRover</a>
+            </li>
+            <li class="active">
+                <strong>Orders</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight ecommerce">
+    <div class="ibox-content m-b-sm border-bottom">
+        <div class="row">
+            <form id="form-data" method="post">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label" for="date_start">开始日期</label>
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input id="date_start" name="date_start" type="text" class="form-control" value="2019-09-22">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="control-label" for="date_end">结束日期</label>
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input id="date_end" name="date_end" type="text" class="form-control" value="2019-10-22">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label" for="status">执行结果</label>
+                    <input type="text" id="status" name="status" value="" placeholder="SUCCES" class="form-control">
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <div class="form-group">
+                    <label class="control-label" for="search">搜  索</label><br />
+                    <button type="button" class="btn btn-info" onclick="PostFormData('form-data')">Search</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="15">
+                        <thead>
+                        <tr>
+                            <th>任务ID</th>
+                            <th data-hide="phone">任务名称</th>
+                            <th data-hide="phone">执行用户</th>
+                            <th data-hide="phone">创建时间</th>
+                            <th data-hide="phone,tablet" >花费时间</th>
+                            <th data-hide="phone">执行结果</th>
+                            <th class="text-right"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%  for o in orders %}
+                        <tr>
+                            <td>{{ o.id }}</td>
+                            <td>{{ o.order_name }}</td>
+                            <td>{{ o.create_user }}</td>
+                            <td>{{ o.create_time | date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ o.cost_time }}</td>
+                            {% if o.order_flag == "SUCCESS"  %}
+                            <td>
+                                <span class="label label-success">SUCCESS</span>
+                            </td>
+                            {% elif o.order_flag == "FAIL" %}
+                            <td>
+                                <span class="label label-danger">FAIL</span>
+                            </td>
+                            {% else %}
+                            <td>
+                                <span class="label label-warning">Pending</span>
+                            </td>
+                            {% endif %}
+                            <td class="text-right">
+                                <div class="btn-group">
+                                    <button class="btn-success btn btn-xs"  onclick="showOrderLogInfo('{{ o.id }}')" data-api="/order/detail/" style="padding: 0px 15px;font-weight: bold">日志</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="7">
+                                <ul class="pagination pull-right"></ul>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="drawer_modal">
+    <div class="right_content">
+        <div id="result"></div>
+    </div>
+</div>
+<div class="modal fade" id="showModalData" tabindex="-1" role="dialog" aria-labelledby="showModalData" aria-hidden="true"></div>
+{% endblock %}
+{% block js-css-content %}
+<style>
+#drawer_modal {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, .3);
+}
+
+#drawer_modal .right_content {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 40%;
+    height: 100%;
+    background: #fff;
+    animation: rtl-drawer-in 225ms cubic-bezier(0, 0, .2, 1) 0ms;
+}
+
+#drawer_modal .right_content i {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 20px;
+}
+
+@keyframes rtl-drawer-in {
+    0% {
+        transform: translate(100%);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+</style>
+<script src="/static/js/jquery.cookie.min.js"type="text/javascript"  charset="utf-8"></script>
+<!-- Date picker -->
+<link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+<script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+
+<!-- FooTable -->
+<script src="/static/js/plugins/footable/footable.all.min.js"></script>
+<script>
+
+var interval = null;
+
+$(document).ready(function() {
+    $('.footable').footable();
+    $('#date_start').datepicker({
+        format: "yyyy-mm-dd",
+        todayBtn: "linked",
+        keyboardNavigation: false,
+        forceParse: false,
+        calendarWeeks: true,
+        autoclose: true
+    });
+    $('#date_end').datepicker({
+        format: "yyyy-mm-dd",
+        todayBtn: "linked",
+        keyboardNavigation: false,
+        forceParse: false,
+        calendarWeeks: true,
+        autoclose: true
+    });
+	$('#drawer_modal').click(function(event) {
+	   if($(event.target).attr('id') === 'drawer_modal') {
+	       $(event.target).hide();
+            clearInterval(interval);
+	   	} 
+	});
+});
+
+
+function showOrderLogInfo(id) {
+    html_obj=$("#result")
+    $('#drawer_modal').show()
+	i=0;
+    $("#result").html("服务器正在处理，请稍等。。。");
+	interval = setInterval(function(){
+	    url_path = '/order/' + id +'/stage/'+ i + '/'
+	    $.ajax({
+	        url : url_path,
+	        type : 'GET',
+	        success : function(result){
+	        	if (result["status"] == 'FAIL' || result["status"] == 'OK') {
+	        	    var css =  result["status"] == 'OK' ? "<p><span class='badge badge-success'>" : "<p><span class='badge badge-danger'>"
+                    html_obj.append(css + result["status"] + "</span> " + result["msg"] + "</p>");
+                    clearInterval(interval);
+                }
+	        	if (result["status"] == 'SUCCESS') {
+	        	    html_obj.append("<p><span class='badge badge-success'>" + result["status"] + "</span> " + result["msg"] + "</p>");
+                }
+	        	if(result["status"] != 'PENDING'){
+	        	    i = i+1;
+                }
+	        }
+	    });
+    }, 500);
+}
+
+function closeOrderLogInfo(id) {
+    clearInterval(interval);
+    $('#'+id).hide()
+}
+
+function showModalBox(obj,id) {
+    var btnObj = $(obj);
+    var modObj = $("#"+id)
+    var getUrl=btnObj.attr('data-api');
+    modObj.on('show.bs.modal',function(e) {
+    //打开前重置表单数据
+       $.ajax({
+		  type: 'GET',
+		  url: getUrl,
+		  success:function(response){
+              modObj.html(response);
+		  },
+		  error:function(response){
+		      modObj.html(response);
+		  },
+		});
+   });
+   modObj.modal("show");
+}
+
+function PostFormData(id) {
+    var form = document.getElementById(id);
+    var post_data = {};
+    var postURL = '/api/v1/order/search/' + {{ id }} + "/";
+	for(var i = 0; i < form.length; ++i) {
+		var name = form[i].name;
+		var value = form[i].value;
+        post_data[name] = value;
+	};
+
+	$.ajax({
+		dataType: "JSON",
+		url: postURL, //请求地址
+		type: "POST",  //提交类似
+		data: post_data, //提交参数
+        headers: {'X-CSRFToken': $.cookie('csrftoken')},
+		success:function(response){
+			$('.footable').html(response);
+		},
+    	error:function(response){
+		    $('.footable').html(response);
+    	}
+	});
+}
+</script>
+{% endblock %}

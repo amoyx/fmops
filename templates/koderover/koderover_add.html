@@ -1,0 +1,53 @@
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+				&times;
+			</button>
+			<h4 class="modal-title">
+				koderover产品增加
+			</h4>
+		</div>
+		<div class="modal-body">
+            <form class="form-horizontal" role="form" id="form-data" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>koderover项目</strong></label>
+				    <div class="col-sm-7">
+					     <input class="form-control" name="product_name" type="text"  required="required" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>koderover组件服务</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" name="service_name" type="text"  required="required" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>k8s命名空间</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" name="kube_namespace" type="text" required="required" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>k8s-deployment名称</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" name="kube_deployment" type="text" required="required" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>说明</strong></label>
+				    <div class="col-sm-7">
+                        <textarea class="form-control" name="description" type="text" rows="3"></textarea>
+				    </div>
+                </div>
+            </form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary" onclick="PostFormData('form-data','/api/v1/koderover/')">
+				增加
+			</button>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,569 @@
+{% extends 'index.html' %}
+{% block page-content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>Basic Form</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/index/">Home</a>
+                        </li>
+                        <li>
+                            <a>服务器管理</a>
+                        </li>
+                        <li class="active">
+                            <strong>添加主机</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <small>增加主机信息</small>
+                        </div>
+                        <div class="ibox-content">
+                            <form method="post" class="form-horizontal" id="addServerAssets">
+                                <div class="form-group"><label class="col-sm-2 control-label">云服务商</label>
+                                    <div class="col-sm-3"><select class="form-control" name="subnet">
+                                        <option value="TencentClound" selected>腾讯云</option>
+                                        <option value="Aliyun">阿里云</option>
+                                        <option value="HuaWei">华为云</option>
+                                        <option value="Kingsoft">金山云</option>
+                                        <option value="aws">亚马孙</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">地域</label>
+                                    <div class="col-sm-4" id="btn-region">
+                                        <button type="button" data-val="ap-guangzhou" class="btn btn-white">广州</button>
+                                        <button type="button" data-val="ap-shanghai" class="btn btn-primary btn-white">上海</button>
+                                        <button type="button" data-val="ap-beijing" class="btn btn-white">北京</button>
+                                        <button type="button" data-val="ap-chengdu" class="btn btn-white">成都</button>
+                                        <button type="button" data-val="ap-chongqing" class="btn btn-white">重庆</button>
+                                        <button type="button" data-val="ap-hongkong" class="btn btn-white">中国香港</button>
+                                    </div>
+                                    <input type="hidden" value="ap-shanghai" name="region" id="region" >
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">可用区域</label>
+                                    <div class="col-sm-5" id="btn-zone"></div>
+                                    <input type="hidden" value="" name="zone" id="zone" >
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">网络</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control" name="vpc" id="selvpcNetwork"></select>
+                                    </div>
+                                    <div class="col-sm-3" style="margin-left: -20px">
+                                        <select class="form-control" name="subnet" id="selSubnet"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">实例规格</label>
+                                    <div class="col-sm-4"><select class="form-control" name="InstanceType">
+                                        <option value="S5.SMALL2" >标准型S5 1核2G Intel Xeon Cascade Lake(2.5 GHz) 25万PPS</option>
+                                        <option value="S5.MEDIUM4">标准型S5 2核4G Intel Xeon Cascade Lake(2.5 GHz) 30万PPS</option>
+                                        <option value="S5.LARGE8" selected>标准型S5 4核8G Intel Xeon Cascade Lake(2.5 GHz) 50万PPS</option>
+                                        <option value="S5.2XLARGE16">标准型S5 8核16G Intel Xeon Cascade Lake(2.5 GHz) 80万PPS</option>
+                                        <option value="S5.4XLARGE32">标准型S5 16核32G Intel Xeon Cascade Lake(2.5 GHz) 150万PPS</option>
+                                        <option value="S5.8XLARGE64">标准型S5 32核64G Intel Xeon Cascade Lake(2.5 GHz) 250万PPS</option>
+                                        <option value="S5.8XLARGE128">标准型S5 32核128G Intel Xeon Cascade Lake(2.5 GHz) 250万PPS</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">安全组</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control" name="SecurityGroupIds" id="selSecurityGroup"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">安全组规则</label>
+                                    <div class="tabs-container col-sm-6" >
+                                        <ul class="nav nav-tabs">
+                                            <li class="active"><a data-toggle="tab" href="#ingress">入站规则</a></li>
+                                            <li class=""><a data-toggle="tab" href="#egress">出站规则</a></li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div id="ingress" class="tab-pane active">
+                                                <div class="panel-body">
+                                                    <table class="table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>来源</th>
+                                                            <th>协议端口</th>
+                                                            <th>策略</th>
+                                                            <th>备注</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div id="egress" class="tab-pane">
+                                                <div class="panel-body">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>目标</th>
+                                                                <th>协议端口</th>
+                                                                <th>策略</th>
+                                                                <th>备注</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">主机名称</label>
+                                    <div class="col-sm-3"><input type="text" name="HostName" class="form-control" required="required"></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">用户名</label>
+                                    <div class="col-sm-1"><p class="form-control-static" style="font-size: 16px;font-family: Verdana">root</p></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">密码</label>
+                                    <div class="col-sm-10">
+                                        <div class="row">
+                                            <div class="col-sm-3"><input type="password" name="Password" class="form-control" required="required"></div>
+                                            <div class="col-sm-3" style="color: red;margin-left: -20px;padding-top: 10px">密码必须8个以上字符，包含数字及大小写字母！</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">确认密码</label>
+                                    <div class="col-sm-10">
+                                        <div class="row">
+                                            <div class="col-sm-3"><input type="password" name="RePassword" class="form-control" required="required"></div>
+                                            <div class="col-sm-3" style="color: red;margin-left: -20px;padding-top: 10px">确认密码必须8个以上字符，包含数字及大小写字母！</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">系统盘</label>
+                                    <div class="col-sm-2"><select class="form-control" name="DiskType">
+                                        <option value="CLOUD_PREMIUM" selected>高性能云硬盘</option>
+                                        <option value="CLOUD_SSD">SSD云硬盘</option>
+                                    </select>
+                                    </div>
+                                    <div class="col-sm-1" style="margin-left: -20px"><select class="form-control" name="DiskSize">
+                                        <option value="50" selected>50GB</option>
+                                        <option value="80">80GB</option>
+                                        <option value="100">100GB</option>
+                                        <option value="200">200GB</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">操作系统</label>
+                                    <div class="col-sm-1"><select class="form-control" id="selPlatform" name="platform">
+                                        <option value="CentOS" selected>CentOS</option>
+                                        <option value="Ubuntu">Ubuntu</option>
+                                        <option value="Debian">Debian</option>
+                                        <option value="windows">Windows</option>
+                                    </select>
+                                    </div>
+                                    <div class="col-sm-3" style="margin-left: -20px">
+                                        <select id="ImageId" class="form-control" name="ImageId"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">购买时长</label>
+                                    <div class="col-sm-2"><select class="form-control" name="Period">
+                                        <option value="1" selected>1个月 - 8.7折</option>
+                                        <option value="2">2个月 - 8.7折</option>
+                                        <option value="3">3个月 - 7.8折</option>
+                                        <option value="4">4个月 - 7.8折</option>
+                                        <option value="5">5个月 - 7.8折</option>
+                                        <option value="6">半年 - 7.3折</option>
+                                        <option value="7">7个月 - 7.3折</option>
+                                        <option value="8">8个月 - 7.3折</option>
+                                        <option value="9">9个月 - 7.3折</option>
+                                        <option value="10">10个月 - 7.3折</option>
+                                        <option value="11">11个月 - 7.3折</option>
+                                        <option value="12">1年 - 6.9折</option>
+                                        <option value="24">2年 - 5.5折</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">公网带宽</label>
+                                    <div class="col-sm-5">
+                                        <label class="checkbox-inline i-checks" style="margin-left: 20px;color: #1f5cff">
+                                            <input type="checkbox" id="PublicIpAssigned" name="PublicIpAssigned" value="0"><i></i>免费分配独立公网IP
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label"></label>
+                                    <div class="col-sm-4" id="btnInternetCharge">
+                                        <button type="button" data-val='BANDWIDTH_PREPAID' class="btn btn-white btn-primary">按带宽计费</button>
+                                        <button type="button" data-val='TRAFFIC_POSTPAID_BY_HOUR' class="btn btn-white">按使用流量计费</button>
+                                    </div>
+                                    <input type="hidden" value="BANDWIDTH_PREPAID" name="InternetChargeType" id="InternetChargeType" >
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label"  style="margin-right: 15px"></label>
+                                    <div class="input-group col-sm-2">
+                                        <input type="text" value="1" class="touchspin1" name="InternetMaxBandwidthOut"><span style="float:left;margin-bottom: 10px;margin-left: 5px;font-weight: bold">Mbps</span>
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <a href="/server/list/" class="btn btn-white" style="margin-right: 20px">取消</a>
+                                        <button class="btn btn-primary" type="button" onclick="addAssetsData(this)" data-api="/api/v1/server/">保存</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block js-css-content %}
+<script src="/static/js/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/xcConfirm.css" />
+<script src="/static/js/jquery.cookie.min.js"type="text/javascript"  charset="utf-8"></script>
+<script src="/static/js/plugins/touchspin/jquery.bootstrap-touchspin.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+
+    modifyBtnZone("ap-shanghai");
+    changeSecurityGroup("ap-shanghai");
+    changeSystemImage("ap-shanghai","CentOS");
+    changeVPCNetwork("ap-shanghai");
+    changeSubnetNetwork('ap-shanghai','vpc-ip9oyz6o','ap-shanghai-2');
+    changeSecurityPolicies('ap-shanghai','sg-oh5urj62');
+
+    $(".touchspin1").TouchSpin({
+        buttondown_class: 'btn btn-white',
+        buttonup_class: 'btn btn-white'
+    });
+
+    $('#btn-region').find('button').click(function() {
+        $(this).addClass('btn-primary').siblings('.btn').removeClass('btn-primary');
+        let region = $(this).attr('data-val');
+        $('#region').val(region);
+        modifyBtnZone(region);
+    });
+
+
+    $('#btn-zone').find('button').click(function() {
+        $(this).addClass('btn-primary').siblings('.btn').removeClass('btn-primary');
+        let data = $(this).attr('data-val');
+        alert(data);
+        {#$('#zone').val(data);#}
+    });
+
+    //服务模块
+    $('#selPlatform').change(function () {
+        var platform = $('#selPlatform option:selected').val();
+        var region = $('#region').val();
+        changeSystemImage(region,platform);
+    });
+    
+    $('#selvpcNetwork').change(function () {
+        var vpc = $('#selvpcNetwork option:selected').val();
+        var region = $('#region').val();
+        changeSubnetNetwork(region,vpc,'ap-shanghai-2');
+    });
+
+    $('#selSecurityGroup').change(function () {
+        var security = $('#selSecurityGroup option:selected').val();
+        var region = $('#region').val();
+        changeSecurityPolicies(region, security);
+    })
+
+    $('#btnInternetCharge').find('button').click(function () {
+        $(this).addClass('btn-primary').siblings('.btn').removeClass('btn-primary');
+        let data = $(this).attr('data-val');
+        $('#InternetChargeType').val(data);
+    })
+});
+
+
+function changeSystemImage(region, platform) {
+    postUrl='/api/v1/tencentcloud/os/image/region/'+region+'/platform/'+ platform +'/';
+    $.ajax({
+        dataType: "JSON",
+        url: postUrl, //请求地址
+        type:"GET",  //提交类似
+        success:function(response){
+            if (response['code'] == 200){
+                var content = "";
+                var selectd = "";
+                $.each(response['data'],function(n,value) {
+                    selectd = n>=1 ? '' : "selected";
+                    content += '<option value="' + value.ImageId + '" ' + selectd + '>' + value.OsName + " | 镜像ID: "+ value.ImageId + "</option>";
+                });
+                $('#ImageId').html(content);
+            } else {
+                window.wxc.xcConfirm("获取镜像信息失败", window.wxc.xcConfirm.typeEnum.error);
+            }
+        },
+        error:function(response){
+            window.wxc.xcConfirm("获取镜像信息失败", window.wxc.xcConfirm.typeEnum.error);
+        }
+    });
+}
+
+function changeSecurityGroup(region) {
+    $.ajax({
+        dataType: "JSON",
+        url: '/api/v1/tencentcloud/security/group/region/'+region+'/', //请求地址
+        type:"GET",  //提交类似
+        success:function(response){
+            if (response['code'] == 200){
+                var content = "";
+                var selectd = "";
+                $.each(response['data'],function(n,value) {
+                    selectd = n>=1 ? '' : "selected";
+                    content += '<option value="' + value.SecurityGroupId + '" ' + selectd + '>' + value.SecurityGroupName + " | 安全组ID: "+ value.SecurityGroupId + "</option>";
+                });
+                $("#selSecurityGroup").html(content);
+            } else {
+                window.wxc.xcConfirm("获取安全组数据失败", window.wxc.xcConfirm.typeEnum.error);
+            }
+        },
+        error:function(response){
+            window.wxc.xcConfirm("获取安全组数据失败", window.wxc.xcConfirm.typeEnum.error);
+        }
+    });
+}
+
+
+function changeSecurityPolicies(region, sid) {
+    $.ajax({
+        dataType: "JSON",
+        url: '/api/v1/tencentcloud/security/policies/region/'+region+'/secid/'+sid+'/',
+        type:"GET",
+        success:function(response){
+            if (response['code'] == 200){
+                var ingress = "";
+                var egress = "";
+                var action = "";
+                var desc="";
+                $.each(response['data']['Ingress'],function(n,value) {
+                    action = value.Action == 'ACCEPT' ? '接受' : "拒绝";
+                    desc = value.PolicyDescription!="" ? value.PolicyDescription : '-';
+                    ingress += '<tr><td>' + value.CidrBlock + '</td><td>' + value.Protocol +':' + value.Port + '</td><td>' + action +'</td><td>'+ value.PolicyDescription + "</td></tr>";
+                });
+                ingress+='<tr><td>0.0.0.0/0</td><td>ALL</td><td>拒绝</td><td>-</td></tr>'
+                $("#ingress table tbody").html(ingress);
+
+                $.each(response['data']['Egress'],function(n,value) {
+                    action = value.Action == 'ACCEPT' ? '接受' : "拒绝";
+                    desc = value.PolicyDescription!="" ? value.PolicyDescription : '-';
+                    egress += '<tr><td>' + value.CidrBlock + '</td><td>' + value.Protocol +':' + value.Port + '</td><td>' + action +'</td><td>'+ desc + "</td></tr>";
+                });
+                egress += '<tr><td>0.0.0.0/0</td><td>ALL</td><td>拒绝</td><td>-</td></tr>'
+                $("#egress table tbody").html(egress);
+            } else {
+                window.wxc.xcConfirm("获取安全组策略数据失败", window.wxc.xcConfirm.typeEnum.error);
+            }
+        },
+        error:function(response){
+            window.wxc.xcConfirm("获取安全组策略数据失败", window.wxc.xcConfirm.typeEnum.error);
+        }
+    });
+}
+
+
+function changeVPCNetwork(region) {
+    $.ajax({
+        dataType: "JSON",
+        url: '/api/v1/tencentcloud/network/vpc/region/'+region+'/', //请求地址
+        type:"GET",  //提交类似
+        success:function(response){
+            if (response['code'] == 200){
+                var content = "";
+                var selectd = "";
+                $.each(response['data'],function(n,value) {
+                    selectd = n>=1 ? '' : "selected";
+                    content += '<option value="' + value.VpcId + '" ' + selectd + '>' + value.VpcId + " | "+ value.VpcName + " | " + value.CidrBlock + "</option>";
+                });
+                $("#selvpcNetwork").html(content);
+            } else {
+                window.wxc.xcConfirm("获取VPC网络数据失败", window.wxc.xcConfirm.typeEnum.error);
+            }
+        },
+        error:function(response){
+            window.wxc.xcConfirm("获取VPC网络数据失败", window.wxc.xcConfirm.typeEnum.error);
+        }
+    });
+}
+
+
+function changeSubnetNetwork(region,vpcid,zone) {
+    $.ajax({
+        dataType: "JSON",
+        url: '/api/v1/tencentcloud/subnet/region/'+region+'/vpcid/'+vpcid+'/zone/'+zone+'/', //请求地址
+        type:"GET",  //提交类似
+        success:function(response){
+            if (response['code'] == 200){
+                var content = "";
+                var selectd = "";
+                $.each(response['data'],function(n,value) {
+                    selectd = n>=1 ? '' : "selected";
+                    content += '<option value="' + value.SubnetId + '" ' + selectd + '>' + value.SubnetId + ' | ' + value.SubnetName + " | "+ value.CidrBlock + "</option>";
+                });
+                $("#selSubnet").html(content);
+            } else {
+                window.wxc.xcConfirm("获取subnet数据失败", window.wxc.xcConfirm.typeEnum.error);
+            }
+        },
+        error:function(response){
+            window.wxc.xcConfirm("获取subnet数据失败", window.wxc.xcConfirm.typeEnum.error);
+        }
+    });
+}
+
+function modifyBtnZone(region) {
+    $.ajax({
+        dataType: "JSON",
+        url: '/api/v1/tencentcloud/zone/region/'+region+ '/', //请求地址
+        type:"GET",  //提交类似
+        success:function(response){
+            if (response['code'] == 200){
+                var content = "";
+                var style = "";
+                $.each(response['data'],function(n,value) {
+                    style = n>=1 ? 'btn-white' : "btn-primary";
+                    if(n<1){ $("#zone").val(value.Zone)}
+                    content += '<button type="button" class="btn ' + style + '" data-val="'+ value.Zone +'">' + value.ZoneName + "</button>  ";
+                });
+                $("#btn-zone").html(content);
+            } else {
+                window.wxc.xcConfirm("获取可用区域失败", window.wxc.xcConfirm.typeEnum.error);
+            }
+        },
+        error:function(response){
+            window.wxc.xcConfirm("获取可用区域失败", window.wxc.xcConfirm.typeEnum.error);
+        }
+    });
+}
+
+
+function addAssetsData(obj) {
+    var btnObj = $(obj);
+    btnObj.attr('disabled',true);
+	var form = document.getElementById('addServerAssets');
+    var required = ["region","zone","vpc","subnet","InstanceType",
+        "SecurityGroupIds","HostName","Password","RePassword","HostName",
+        "DiskType","DiskSize","ImageId","Period","InternetChargeType","InternetMaxBandwidthOut"];
+    var postUrl = btnObj.attr('data-api');
+    var post_data = {};
+
+	for(var i = 0; i < form.length; ++i) {
+		var name = form[i].name;
+		var value = form[i].value;
+        idx = $.inArray(name, required);
+
+        if (name.length == 0) {continue;}
+		if (idx >= 0 && value.length == 0){
+		    $("[name='" + name + "']").parent().addClass("has-error");
+			window.wxc.xcConfirm("请注意必填项不能为空~", window.wxc.xcConfirm.typeEnum.error);
+			btnObj.removeAttr('disabled');
+			return false;
+		}
+		else{
+		    if (name == 'Password' && !CheckPasswordStrength(value)) {
+                $("[name='" + name + "']").parent().addClass("has-error");
+                btnObj.removeAttr('disabled');
+                window.wxc.xcConfirm("密码太简单,必须8个以上字符，且包含 数字/大小写字母", window.wxc.xcConfirm.typeEnum.error);
+                return false;
+            }
+
+		    if(name =="RePassword" && value != post_data['Password']){
+                $("[name='" + name + "']").parent().addClass("has-error");
+                btnObj.removeAttr('disabled');
+                window.wxc.xcConfirm("两次密码不一致", window.wxc.xcConfirm.typeEnum.error);
+                return false;
+            }
+		    $("[name='" + name + "']").parent().removeClass("has-error");
+			post_data[name] = value;
+		};
+	};
+
+	if($("#PublicIpAssigned").is(':checked')){
+	    post_data['PublicIpAssigned'] = 'true';
+    } else {
+	    post_data['PublicIpAssigned'] = 'false';
+    }
+
+	$.ajax({
+		url: '/api/v1/tencentcloud/cvm/instances/run/', //请求地址
+		type: "POST",
+        headers:{'X-CSRFToken': $.cookie('csrftoken')},
+		data: post_data,
+		success:function(response){
+            if (response['code'] == 200){
+                console.log(response['data'])
+                {#$("#btn-zone").html(content);#}
+                //'Content-Type':'application/json;charset=utf8',
+            } else {
+                window.wxc.xcConfirm(response['messages'], window.wxc.xcConfirm.typeEnum.error);
+                btnObj.removeAttr('disabled');
+            }
+		},
+    	error:function(response){
+    		window.wxc.xcConfirm("云主机实例创建失败", window.wxc.xcConfirm.typeEnum.error);
+    		btnObj.removeAttr('disabled');
+    	}
+	});
+
+}
+
+
+
+function CheckPasswordStrength(passwd) {
+    var value = passwd;
+    var value_length = value.length;
+    var code_length = 0;
+
+
+    //8-20位字符验证
+    if (value_length >= 20 && value_length <= 8) {
+        return false;
+    }
+
+    if (/[0-9]/.test(value)) {
+        code_length++;
+    }
+    if (/[a-z]/.test(value)) {
+        code_length++;
+    }
+    if (/[A-Z]/.test(value)) {
+        code_length++;
+    }
+
+    if (code_length>=3) {
+        return true;
+    }else {
+        return false;
+    }
+}
+
+
+function CheckServerPort(port) {
+    if (port.length < 1){
+        return false;
+    }
+    if (isNaN(value) || value > 65535 || value < 10 ) {
+        return false;
+    }else {
+        return true;
+    }
+}
+
+function isIPAddress(ip) {
+    if(ip.length == 0){
+        return false;
+    }
+    reg = /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
+    if (reg.test(ip)) {
+        return true;
+    }else {
+        return false;
+    }
+}
+</script>
+{% endblock %}

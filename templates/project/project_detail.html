@@ -1,0 +1,73 @@
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+				&times;
+			</button>
+			<h4 class="modal-title">
+				{{ project.business_name }} 项目查看
+			</h4>
+		</div>
+		<div class="modal-body">
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>业务线</strong></label>
+				    <div class="col-sm-7">
+					     <input class="form-control" type="text" disabled value="{{ project.business_name }}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>应用名称</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" type="text" disabled value="{{ project.project_name }}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>envprofile</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" type="text" disabled value="{{ project.project_envprofile |default_if_none:''}}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>命名空间</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" type="text" disabled value="{{ project.project_kube_namespace |default_if_none:''}}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>k8s服务名称</strong></label>
+				    <div class="col-sm-7">
+					    <input class="form-control" type="text" disabled  value="{{ project.project_kube_service|default_if_none:'' }}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>启动命令</strong></label>
+				    <div class="col-sm-7">
+                         <textarea class="form-control" disabled name="project_start_cmdline" rows="3">{{ project.project_start_cmdline |default_if_none:''}}</textarea>
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>代码仓库地址</strong></label>
+				    <div class="col-sm-7">
+                        <input class="form-control" type="text" disabled value="{{ project.project_repo_address|default_if_none:'' }}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>说明</strong></label>
+				    <div class="col-sm-7">
+                        <input class="form-control" type="text" disabled  value="{{ project.description |default_if_none:''}}" />
+				    </div>
+                </div>
+                <div class="form-group">
+				    <label class="col-sm-3 control-label no-padding-right" for="form-field-4"><strong>创建时间</strong></label>
+				    <div class="col-sm-7">
+                        <input class="form-control" type="text" disabled value="{{ project.create_time | date:"Y-m-d H:i:s" }}" />
+				    </div>
+                </div>
+            </form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		</div>
+	</div>
+</div>

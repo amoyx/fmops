@@ -1,0 +1,59 @@
+{% extends 'index.html' %}
+{% block page-content %}
+            <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>Static Tables</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/kubernetes/namespaces/">Home</a>
+                        </li>
+                        <li>
+                            <a href="/kubernetes/namespaces/{{ namespace }}/deployments/">Deployment</a>
+                        </li>
+                        <li class="active">
+                            <strong>Pod</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+        <div class="wrapper wrapper-content animated fadeInRight" id="app">
+            <div class="row">
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{{ deployment }}</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>实例名称</th>
+                                <th>状态</th>
+                                <th>所在节点IP</th>
+                                <th>创建时间</th>
+                                <th>重启次数</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for value in listData.pods %}
+							  <tr class="gradeX">
+								<td>{{ forloop.counter }}</td>
+                                <td>{{ value.objectMeta.name }}</td>
+                                <td>{{ value.podStatus.status }}</td>
+                                <td>{{ value.nodeName }}</td>
+                                <td>{{ value.objectMeta.creationTimestamp }}</td>
+                                <td class="center">{{ value.restartCount }}</td>
+                              </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+{% endblock %}

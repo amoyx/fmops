@@ -1,0 +1,139 @@
+{% extends 'index.html' %}
+{% block page-content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>Basic Form</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/index/">Home</a>
+                        </li>
+                        <li>
+                            <a>服务器管理</a>
+                        </li>
+                        <li class="active">
+                            <strong>主机信息修改</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <small>修改主机信息</small>
+                        </div>
+                        <div class="ibox-content">
+                            <form method="post" class="form-horizontal" id="addServerAssets">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{ server.id }}" />
+                                <div class="form-group"><label class="col-sm-2 control-label">主机名称</label>
+                                    <div class="col-sm-3"><input type="text" name="hostname" value="{{ server.hostname }}" class="form-control" required="required" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">IP地址</label>
+                                    <div class="col-sm-3"><input type="text" name="ip_address" value="{{ server.ip_address }}" class="form-control" required="required" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">用户名</label>
+                                    <div class="col-sm-3"><input type="text" name="username" value="{{ server.username }}" class="form-control" required="required" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">Password</label>
+                                    <div class="col-sm-3"><input type="password" name="passwd" value="{{ server.passwd }}" class="form-control" required="required" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">SSH端口号</label>
+                                    <div class="col-sm-3"><input type="text" name="ssh_port" value="{{ server.ssh_port }}" class="form-control" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">内存大小</label>
+                                    <div class="col-sm-3"><input type="text" name="ram_total" value="{{ server.ram_total }}" class="form-control" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">硬盘大小</label>
+                                    <div class="col-sm-3"><input type="text" name="disk_total" value="{{ server.disk_total }}" class="form-control" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">CPU配置</label>
+                                    <div class="col-sm-3"><input type="text" name="cpu" value="{{ server.cpu }}" class="form-control" /></div>
+                                </div>
+                                <div class="form-group"><label class="col-sm-2 control-label">操作系统类型</label>
+                                    <div class="col-sm-3"><select class="form-control m-b" name="system">
+                                        <option value="CentOS" {% if server.system == 'CentOS' %}selected {% endif %}>CentOS</option>
+                                        <option value="Ubuntu" {% if server.system == 'Ubuntu' %}selected {% endif %}>Ubuntu</option>
+                                        <option value="RedHat" {% if server.system == 'RedHat' %}selected {% endif %}>RedHat</option>
+                                        <option value="Debian" {% if server.system == 'Debian' %}selected {% endif %}>Debian</option>
+                                        <option value="Fedora" {% if server.system == 'Fedora' %}selected {% endif %}>Fedora</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <a href="/server/list/" class="btn btn-white">取消</a>
+                                        <button class="btn btn-primary" type="button" onclick="addAssetsData(this)" data-api="/api/v1/server/{{ server.id }}/">保存</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block js-css-content %}
+<script src="/static/js/xcConfirm.js" type="text/javascript"  charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/xcConfirm.css" />
+<script type="text/javascript">
+function addAssetsData(obj) {
+    var btnObj = $(obj);
+    btnObj.attr('disabled',true);
+	var form = document.getElementById('addServerAssets');
+    var required = ["hostname",'ip_address',"passwd",'username','ssh_port'];
+    var postUrl = btnObj.attr('data-api');
+    var post_data = {};
+
+	for(var i = 0; i < form.length; ++i) {
+		var name = form[i].name;
+		var value = form[i].value;
+        idx = $.inArray(name, required);
+		if (idx >= 0 && value.length == 0){
+		    $("[name='" + name + "']").parent().addClass("has-error");
+			window.wxc.xcConfirm("请注意必填项不能为空~", window.wxc.xcConfirm.typeEnum.error);
+			btnObj.removeAttr('disabled');
+			return false;
+		}
+		else{
+		    if (name == 'ssh_port' && (isNaN(value) || value > 65535 || value < 10 )) {
+                $("[name='" + name + "']").parent().addClass("has-error");
+                btnObj.removeAttr('disabled');
+                window.wxc.xcConfirm("端口号必须为10~65535数字", window.wxc.xcConfirm.typeEnum.error);
+                return false;
+            }
+		    reg = /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/
+            if (name=="ip_address" && ! reg.test(value)) {
+                $("[name='" + name + "']").parent().addClass("has-error");
+                btnObj.removeAttr('disabled');
+                window.wxc.xcConfirm("请正确填写IP地址", window.wxc.xcConfirm.typeEnum.error);
+                return false;
+            }
+		    $("[name='" + name + "']").parent().removeClass("has-error");
+			post_data[name] = value;
+		};
+	};
+	btnObj.removeAttr('disabled');
+	$.ajax({
+		dataType: "JSON",
+		url: postUrl, //请求地址
+		type:"POST",  //提交类似
+		{#contentType: "application/json",#}
+		data: post_data,
+		success:function(response){
+			window.wxc.xcConfirm("主机信息修改成功", window.wxc.xcConfirm.typeEnum.success);
+			window.location.href="/server/list/";
+		},
+    	error:function(response){
+    		window.wxc.xcConfirm("主机信息修改失败", window.wxc.xcConfirm.typeEnum.error);
+    	}
+	});
+}
+</script>
+{% endblock %}

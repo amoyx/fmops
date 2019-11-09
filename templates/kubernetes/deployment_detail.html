@@ -1,0 +1,196 @@
+{% extends 'index.html' %}
+{% block page-content %}
+            <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>{{ deployment }}</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/index">Home</a>
+                        </li>
+                        <li>
+                            <a href="/kubernetes/namespaces/{{ namespace }}/deployments/">Deployment</a>
+                        </li>
+                        <li class="active">
+                            <strong>Pod</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+        <div class="wrapper wrapper-content animated fadeIn">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="tabs-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#tab-1"> Pod管理 </a></li>
+                            <li class=""><a data-toggle="tab" href="#tab-2">修订历史</a></li>
+                            <li class=""><a data-toggle="tab" href="#tab-3">  事件  </a></li>
+                            <li class=""><a data-toggle="tab" href="#tab-4">  日志  </a></li>
+                            <li class=""><a data-toggle="tab" href="#tab-5">  详情  </a></li>
+                            <li class=""><a data-toggle="tab" href="#tab-6">  YAML  </a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab-1" class="tab-pane active">
+                                <div class="panel-body">
+                                     <div class="ibox-content">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th>实例名称</th>
+                                                    <th>状态</th>
+                                                    <th>所在节点IP</th>
+                                                    <th>创建时间</th>
+                                                    <th>重启次数</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for value in listData.pod_list.pods %}
+                                                  <tr class="gradeX">
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ value.objectMeta.name }}</td>
+                                                      {% if value.podStatus.status == 'Running' %}
+                                                        <td style="color: green">{{ value.podStatus.status }}</td>
+                                                      {% else %}
+                                                        <td style="color: red">{{ value.podStatus.status }}</td>
+                                                      {% endif %}
+                                                    <td>{{ value.nodeName }}</td>
+                                                    <td>{{ value.objectMeta.creationTimestamp }}</td>
+                                                    <td class="center">{{ value.restartCount }}</td>
+                                                  </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                </div>
+                            </div>
+                            <div id="tab-2" class="tab-pane">
+                                <div class="panel-body">
+                                     <div class="ibox-content">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th>版本号</th>
+                                                    <th>版本详情</th>
+                                                    <th>镜像</th>
+                                                    <th>更新时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for value in listData.history_data.replicaSets %}
+                                                  <tr class="gradeX">
+                                                    <td>v{{ forloop.counter }}</td>
+                                                    <td>{{ value.containerImages.0 | slice:"-12:" }}</td>
+                                                    <td >{{ value.objectMeta.name }}</td>
+                                                    <td>{{ value.containerImages }}</td>
+                                                    <td>{{ value.objectMeta.creationTimestamp }}</td>
+                                                    <td class="center">回滚</td>
+                                                  </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <div id="tab-3" class="tab-pane">
+                                <div class="panel-body">
+                                     <div class="ibox-content">
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th>首次出现时间</th>
+                                                    <th>最后出现时间</th>
+                                                    <th>级别</th>
+                                                    <th>资源类型</th>
+                                                    <th>资源名称</th>
+                                                    <th>内容</th>
+                                                    <th>详细描述</th>
+                                                    <th>出现次数</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                  <tr class="gradeX">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                  </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <div id="tab-4" class="tab-pane">
+                                <div class="panel-body">
+                                    <p> this is log </p>
+                                </div>
+                            </div>
+
+                            <div id="tab-5" class="tab-pane">
+                                 <div class="ibox-title">
+                                    <h1 style="font-weight: bold;font-family: 黑体;font-size: 40px">基本信息</h1>
+                                 </div>
+                                 <div class="ibox-content">
+                                     <h3 >名称
+                                         <small>{{ listData.detail_data.objectMeta.name }} </small>
+                                     </h3>
+                                     <h3>Namespace
+                                         <small>{{ listData.detail_data.objectMeta.namespace }}</small>
+                                     </h3 >
+                                     <h3>描述
+                                         <small>{{ listData.detail_data.objectMeta.annotations }}</small>
+                                     </h3>
+                                     <h3>创建时间
+                                         <small>{{ listData.detail_data.objectMeta.creationTimestamp }}</small>
+                                     </h3>
+                                     <h3 >Lables
+                                         <small>{{ listData.detail_data.objectMeta.labels }}</small>
+                                     </h3>
+                                     <h3>Selector
+                                         <small>{{ listData.detail_data.selector }}</small>
+                                     </h3>
+                                     <h3>更新策略
+                                         <small>{{ listData.detail_data.strategy }}</small>
+                                     </h3>
+                                     <h3>副本数
+                                         <small>{{ listData.detail_data.statusInfo.replicas }}</small>
+                                     </h3>
+                                     <h3>运行副本数
+                                         <small>{{ listData.detail_data.statusInfo.available }}</small>
+                                     </h3>
+                                 </div>
+                            </div>
+
+                            <div id="tab-6" class="tab-pane">
+                                <div class="panel-body">
+                                    <p> YAML </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+{% block js-css-content %}
+<style type="text/css">
+#tab-5 h3 {
+   margin-top: 30px;
+   color: #9ea6b9;
+}
+#tab-5 h3 small {
+    padding-left: 100px;
+    color: #000000;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'index.html' %}
+{% block page-content %}
+            <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>KodeRover Data</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/index">Home</a>
+                        </li>
+                        <li class="active">
+                            <strong>KodeRover应用管理</strong>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row">
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>KodeRover - 服务列表</h5> <div style="float: right;margin-right: 15px"><a href="#" class="label label-primary pull-right" onclick="showModalBox(this,'addModalData')" data-api="/koderover/add/" style="font-weight:bold;padding: 7px 15px">添加</a></div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-example" >
+                            <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>koderover 产品线名称</th>
+                                <th>koderover 组件服务名称</th>
+                                <th>k8s namespace</th>
+                                <th>k8s deployment</th>
+                                <th class="text-center">服务部署</th>
+                                <th class="text-right">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for k in koderoverList %}
+                            <tr class="gradeX">
+                                <td>{{ k.id }}</td>
+                                <td>{{ k.product_name }}</td>
+                                <td>{{ k.service_name }}</td>
+                                <td class="center">{{ k.kube_namespace }}</td>
+                                <td class="center">{{ k.kube_deployment }}</td>
+                                <td class="text-center"><a href="#" class="btn-danger btn btn-xs" style="padding: 2px 25px;" onclick="koderOverDeploy(this, '{{k.id }}', '{{ k.service_name }}')"><strong>发布</strong></a></td>
+                                <td class="text-right">
+                                    <div class="btn-group">
+                                        <button class="btn-white btn btn-xs" onclick="showModalBox(this,'viewModalData')" data-api="/koderover/detail/{{ k.id }}/view/">查看</button>
+                                        <button class="btn-white btn btn-xs" onclick="showModalBox(this,'editModalData')" data-api="/koderover/detail/{{ k.id}}/edit/">编辑</button>
+                                        <a href="/order/list/{{ k.id }}/" target="_self" class="btn-white btn btn-xs"><strong>查看记录</strong></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    <div class="modal fade" id="editModalData" tabindex="-1" role="dialog" aria-labelledby="editModalData" aria-hidden="true">
+	</div>
+    <div class="modal fade" id="viewModalData" tabindex="-1" role="dialog" aria-labelledby="viewModalData" aria-hidden="true">
+	</div>
+    <div class="modal fade" id="addModalData" tabindex="-1" role="dialog" aria-labelledby="addModalData" aria-hidden="true">
+	</div>
+{% endblock %}
+{% block js-css-content %}
+    <!-- Page-Level Scripts -->
+<script src="/static/js/xcConfirm.js" type="text/javascript"  charset="utf-8"></script>
+<script src="/static/js/jquery.cookie.min.js"type="text/javascript"  charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/xcConfirm.css" />
+
+<script>
+$(document).ready(function(){
+    $('.dataTables-example').DataTable({
+        pageLength: 25,
+        responsive: true,
+        dom: '<"html5buttons"B>lTfgitp',
+        buttons: [
+            {extend: 'excel', title: 'ExampleFile'},
+            {extend: 'pdf', title: 'ExampleFile'},
+            {
+                extend: 'print',
+                customize: function (win) {
+                    $(win.document.body).addClass('white-bg');
+                    $(win.document.body).css('font-size', '10px');
+
+                    $(win.document.body).find('table')
+                        .addClass('compact')
+                        .css('font-size', 'inherit');
+                }
+            }
+        ]
+    });
+});
+
+function showModalBox(obj,id) {
+    var btnObj = $(obj);
+    var modObj = $("#"+id)
+    var getUrl=btnObj.attr('data-api');
+    modObj.on('show.bs.modal',function(e) {
+    //打开前重置表单数据
+       $.ajax({
+		  type: 'GET',
+		  url: getUrl,
+		  success:function(response){
+              modObj.html(response);
+		  },
+		  error:function(response){
+		      modObj.html(response);
+		  },
+		});
+   });
+   modObj.modal("show");
+}
+
+function PostFormData(id, url) {
+    var form = document.getElementById(id);
+    var post_data = {};
+    var required = ["product_name",'service_name','kube_namespace',"kube_deployment"];
+
+	for(var i = 0; i < form.length; ++i) {
+		var name = form[i].name;
+		var value = form[i].value;
+        idx = $.inArray(name, required);
+		if (idx >= 0 && value.length == 0){
+		    $("[name='" + name + "']").parent().addClass("has-error");
+			window.wxc.xcConfirm("请注意必填项不能为空~", window.wxc.xcConfirm.typeEnum.error);
+			return false;
+		}
+		else{
+		    $("[name='" + name + "']").parent().removeClass("has-error");
+			post_data[name] = value;
+		};
+	};
+
+	$.ajax({
+		dataType: "JSON",
+		url:url, //请求地址
+		type:"POST",  //提交类似
+		data: post_data, //提交参数
+		success:function(response){
+			window.wxc.xcConfirm("添加成功", window.wxc.xcConfirm.typeEnum.success);
+			location.reload();
+		},
+    	error:function(response){
+    		window.wxc.xcConfirm(response['data'] + "添加失败", window.wxc.xcConfirm.typeEnum.error);
+    	}
+	})
+}
+
+function koderOverDeploy(obj,id,name) {
+	var txt=  "确定是否发布？";
+	var btnObj = $(obj);
+	btnObj.attr('disabled',true);
+	var post_data = {};
+	post_data['id'] = id;
+	post_data['service_name'] = name;
+	var option = {
+		title: name + " 服务发布",
+		btn: parseInt("0011",2),
+		onOk: function(){
+			$.ajax({
+                type: 'POST',
+                url: '/api/v1/koderover/deploy/',
+                data: post_data,
+                headers: {'X-CSRFToken': $.cookie('csrftoken')},
+                success:function(response){
+			    	btnObj.removeAttr('disabled');
+			    	if (response['code']=="200"){
+			    	    window.wxc.xcConfirm(response['msg'], window.wxc.xcConfirm.typeEnum.success);
+                        location.reload('/koderover/list/');
+                    } else {
+			    	    window.wxc.xcConfirm(response['msg'], window.wxc.xcConfirm.typeEnum.error);
+                    }
+			     },
+                error:function(response){
+	            	btnObj.removeAttr('disabled');
+	            	window.wxc.xcConfirm("发布请求提交失败！", window.wxc.xcConfirm.typeEnum.error);
+                }
+            });
+		},
+		onCancel:function(){
+		    btnObj.removeAttr('disabled');
+		},
+		onClose:function(){
+		    btnObj.removeAttr('disabled');
+		}
+	}
+	window.wxc.xcConfirm(txt, "custom", option);
+}
+</script>
+{% endblock %}
